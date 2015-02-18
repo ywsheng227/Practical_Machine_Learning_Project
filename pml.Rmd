@@ -5,7 +5,7 @@ date: "Monday, February 16, 2015"
 output: html_document
 ---
 
-## Executive Summary
+## Background
 Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. 
 
 In this project, my goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants to predict the manner in which they did the exercise.
@@ -19,24 +19,25 @@ First, load `pml-training` and `pml-testing` datasets, which each contains 160 v
 ```{r echo=TRUE} 
   library(randomForest)
   library(caret)
+  set.seed(12345)
   setwd("C:/Users/Yuewei/Documents/R/data/Practical_Machine_Learning")
   trainUrl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
   testUrl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
   training_data <- read.csv(url(trainUrl), header=TRUE, na.string=c("NA","#DIV/0!",""))
-  evaluation_data <- read.csv(url(testUrl), header=TRUE, na.string=c("NA","#DIV/0!",""))
+  testing_data <- read.csv(url(testUrl), header=TRUE, na.string=c("NA","#DIV/0!",""))
   training_clean <- training_data[, colSums(is.na(training_data))==0]
   training_clean <- training_clean[-c(1:7)]
-  evaluation_clean <- evaluation_data[, colSums(is.na(evaluation_data))==0]
-  evaluation_clean <- evaluation_clean[-c(1:7)]
+  testing_clean <- testing_data[, colSums(is.na(testing_data))==0]
+  testing_clean <- testing_clean[-c(1:7)]
 ```
 
 ##Build A Random Forest Model
-First, create training and testing sets from the clean training data, in order to perform cross validation. 
+First, create training and evaluation sets from the cleaned training data, in order to perform cross validation. 
 
 ```{r echo=TRUE} 
   inTrain <- createDataPartition(y=training_clean$classe, p=0.75, list=FALSE)
   training <- training_clean[inTrain,]
-  testing <- training_clean[-inTrain,]
+  evaluation <- training_clean[-inTrain,]
 ```
 
 Second, build a random forest using `randomForest` package. 
@@ -50,18 +51,18 @@ Second, build a random forest using `randomForest` package.
 I then perform cross validation by comparing the predicted classes of the testing set to the actual classes. 
 
 ```{r echo=TRUE}
-  pred1 <- predict(modFit1, testing) 
-  confusionMatrix(pred1, testing$classe)
+  pred1 <- predict(modFit1, evaluation) 
+  confusionMatrix(pred1, evaluation$classe)
 ```
 
-As shown above, the `accuracy` of this model is very high (99.61%). Therefore, I can use it to predict the classes for the test cases. 
+As shown above, the `accuracy` of this model is very high (>99%). Therefore, I can use it to predict the classes for the test cases. 
 
 ##Predict Test Cases
 
-Here, the random forest model built above was used to predict the 20 different test cases. As the in-sample error is 0.39% (`1 - accuracy`), the out-of-sample error is estimated to be 0.39%.
+Here, the random forest model built above was used to predict the 20 different test cases. As the in-sample error is <1% (`1 - accuracy`), the out-of-sample error is estimated to be <1%.
 
 ```{r echo=TRUE}
-  pred2 <- predict(modFit1, evaluation_clean)
+  pred2 <- predict(modFit1, testing_clean)
 
   pml_write_files = function(x){
   n = length(x)
