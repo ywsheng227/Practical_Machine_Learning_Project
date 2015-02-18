@@ -93,10 +93,10 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </div>
 <div id="build-a-random-forest-model" class="section level2">
 <h2>Build A Random Forest Model</h2>
-<p>First, create training and evaluation sets from the cleaned training data, in order to perform cross validation.</p>
+<p>First, create training and validation sets from the cleaned training data, in order to perform cross validation.</p>
 <pre class="r"><code>  inTrain &lt;- createDataPartition(y=training_clean$classe, p=0.75, list=FALSE)
   training &lt;- training_clean[inTrain,]
-  evaluation &lt;- training_clean[-inTrain,]</code></pre>
+  validation &lt;- training_clean[-inTrain,]</code></pre>
 <p>Second, build a random forest using <code>randomForest</code> package.</p>
 <pre class="r"><code>  modFit1 &lt;- randomForest(classe ~., data=training)
   modFit1</code></pre>
@@ -119,8 +119,8 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div id="perform-cross-validation" class="section level2">
 <h2>Perform Cross Validation</h2>
 <p>I then perform cross validation by comparing the predicted classes of the testing set to the actual classes.</p>
-<pre class="r"><code>  pred1 &lt;- predict(modFit1, evaluation) 
-  confusionMatrix(pred1, evaluation$classe)</code></pre>
+<pre class="r"><code>  pred1 &lt;- predict(modFit1, validation) 
+  confusionMatrix(pred1, validation$classe)</code></pre>
 <pre><code>## Loading required namespace: e1071</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 

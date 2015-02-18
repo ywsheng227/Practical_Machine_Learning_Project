@@ -32,12 +32,12 @@ First, load `pml-training` and `pml-testing` datasets, which each contains 160 v
 ```
 
 ##Build A Random Forest Model
-First, create training and evaluation sets from the cleaned training data, in order to perform cross validation. 
+First, create training and validation sets from the cleaned training data, in order to perform cross validation. 
 
 ```{r echo=TRUE} 
   inTrain <- createDataPartition(y=training_clean$classe, p=0.75, list=FALSE)
   training <- training_clean[inTrain,]
-  evaluation <- training_clean[-inTrain,]
+  validation <- training_clean[-inTrain,]
 ```
 
 Second, build a random forest using `randomForest` package. 
@@ -51,8 +51,8 @@ Second, build a random forest using `randomForest` package.
 I then perform cross validation by comparing the predicted classes of the testing set to the actual classes. 
 
 ```{r echo=TRUE}
-  pred1 <- predict(modFit1, evaluation) 
-  confusionMatrix(pred1, evaluation$classe)
+  pred1 <- predict(modFit1, validation) 
+  confusionMatrix(pred1, validation$classe)
 ```
 
 As shown above, the `accuracy` of this model is very high (>99%). Therefore, I can use it to predict the classes for the test cases. 
